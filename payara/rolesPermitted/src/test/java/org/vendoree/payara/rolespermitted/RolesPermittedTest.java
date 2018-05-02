@@ -41,24 +41,25 @@ package org.vendoree.payara.rolespermitted;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebResponse;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebResponse;
-import java.io.IOException;
-import org.junit.After;
 import org.junit.Before;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.junit.After;
 import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  *
@@ -67,10 +68,10 @@ import org.junit.Assert;
 @RunWith(Arquillian.class)
 public class RolesPermittedTest {
 
-    public static final String WEBAPP_SOURCE = "src/main/webapp";
-    public static final String USER = "payara";
-    public static final String PASSWORD = "fish";
-    public static final String ROLE = "payaraAdmin";
+    private static final String WEBAPP_SOURCE = "src/main/webapp";
+    private static final String USERNAME = "payara";
+    private static final String PASSWORD_ADMIN = "fish";
+    private static final String PASSWORD_USER = "user";
 
     private WebClient webClient;
 
@@ -79,17 +80,11 @@ public class RolesPermittedTest {
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
-
-        File lib = Maven.resolver()
-                .resolve("net.sourceforge.htmlunit:htmlunit:2.29")
-                .withoutTransitivity()
-                .asSingle(File.class);
-      
         return ShrinkWrap.create(WebArchive.class, "rolesPermitted.war")
                 .addPackage("org.vendoree.payara.rolespermitted")
+                .addPackage("org.vendoree.payara.rolespermitted.rest")
                 .addAsWebInfResource(new File(WEBAPP_SOURCE, "WEB-INF/web.xml"))
-                .addAsWebInfResource(new File(WEBAPP_SOURCE, "WEB-INF/glassfish-web.xml"))
-                .addAsLibrary(lib);
+                .addAsWebInfResource(new File(WEBAPP_SOURCE, "WEB-INF/glassfish-web.xml"));
     }
 
     @Before
@@ -101,66 +96,55 @@ public class RolesPermittedTest {
     }
 
     @Test
-    public void testWithRightAuthentication() throws InterruptedException {
-        String response = getResponse("/testServlet?username=" + USER + "&password=" + PASSWORD);
-
-        if (response.contains("Username = " + USER) && response.contains("Does User belong to role \"" + ROLE + "\" : true")) {
-            Assert.assertTrue("Authentication was sucessfully", true);
-        } else {
-            Assert.fail("Authentication Failed");
-        }
-    }
-
-    @Test
-    public void testWithNoAuthentication() {
-        String response = getResponse("/testServlet");
-
-        if (response.contains("Username = " + USER) && response.contains("Does User belong to role \"" + ROLE + "\" : true")) {
-            Assert.fail("Authentication shouldn't be sucessfully");
-        } else {
-            Assert.assertTrue("Authentication was rightly unsucessful", true);
-        }
-    }
-
-    @Test
+    @RunAsClient
     public void testAuthenticationWithIncorrectUser() {
-        String response = getResponse("/testServlet?username=payra" + "&password=" + PASSWORD);
+        WebResponse response = getResponse("/rest/test/admin?username=" + "wrongUser" + "&password=" + PASSWORD_ADMIN);
+        System.out.println("sdad = " + response.getContentAsString());
+        assertEquals(401, response.getStatusCode());
+    }
 
-        if (response.contains("Username = " + USER) && response.contains("Does User belong to role \"" + ROLE + "\" : true")) {
-            Assert.fail("Wrong username, but authentication was sucessfully");
+    @Test
+    @RunAsClient
+    public void testToAccessAdminResource() {
+        WebResponse webresponse = getResponse("/rest/test/admin?username=" + USERNAME + "&password=" + PASSWORD_ADMIN);
+        assertEquals(200, webresponse.getStatusCode());
+
+        String response = getResponse("/rest/test/admin?username=" + USERNAME + "&password=" + PASSWORD_USER).getContentAsString();
+        if (response.contains("Caller was not permitted access to a protected resource")) {
+            Assert.assertTrue("User was sucessfully not permitted to access admin resource", true);
         } else {
-            Assert.assertTrue("Wrong username, authentication was rightly unsucessful", true);
+            Assert.fail("Only admin should be able to access admin protected resource");
+
         }
     }
 
     @Test
-    public void testAuthenticationWithIncorrectPassword() {
-        String response = getResponse("/testServlet?username=" + USER + "&password=fissh");
+    @RunAsClient
+    public void testToAccessGeneralResource() {
+        WebResponse webresponse = getResponse("/rest/test/admin?username=" + USERNAME + "&password=" + PASSWORD_ADMIN);
+        assertEquals(200, webresponse.getStatusCode());
 
-        if (response.contains("Username = " + USER) && response.contains("Does User belong to role \"" + ROLE + "\" : true")) {
-            Assert.fail("Wrong password, but authentication was sucessfully");
-        } else {
-            Assert.assertTrue("Wrong password, authentication was rightly unsucessful", true);
-        }
+        WebResponse webresponse2 = getResponse("/rest/test/admin?username=" + USERNAME + "&password=" + PASSWORD_USER);
+        assertEquals(200, webresponse2.getStatusCode());
     }
 
-    private String getResponse(String url) {
+    private WebResponse getResponse(String url) {
         WebResponse webResponse = getHtmlpage(url).getWebResponse();
-        return webResponse.getContentAsString();
+        return webResponse;
     }
 
     private Page getHtmlpage(String path) {
         if (url.toString().endsWith("/") && path.startsWith("/")) {
             path = path.substring(1);
         }
-        
+
         Page page = null;
         try {
             page = webClient.getPage(url + path);
         } catch (IOException | FailingHttpStatusCodeException ex) {
             Logger.getLogger(RolesPermittedTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return page;
     }
 

@@ -60,8 +60,14 @@ public class IdentityStoreTest implements IdentityStore {
 
         if (userLoginCredential.getCaller().equals("payara")
                 && userLoginCredential.getPasswordAsString().equals("fish")) {
-            return new CredentialValidationResult("payara", new HashSet<>(asList("payaraAdmin")));
+            return new CredentialValidationResult("payara", new HashSet<>(asList("payaraAdmin", "payaraUser")));
         }
+        
+        if (userLoginCredential.getCaller().equals("payara")
+                && userLoginCredential.getPasswordAsString().equals("user")) {
+            return new CredentialValidationResult("payara", new HashSet<>(asList("payaraUser")));
+        }
+        
         return INVALID_RESULT;
     }
 }

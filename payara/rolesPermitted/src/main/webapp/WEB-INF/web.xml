@@ -5,4 +5,7 @@
     <security-role>
         <role-name>payaraAdmin</role-name>
     </security-role>
+        <security-role>
+        <role-name>payaraUser</role-name>
+    </security-role>
 </web-app>

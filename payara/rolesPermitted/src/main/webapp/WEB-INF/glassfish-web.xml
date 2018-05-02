@@ -6,6 +6,11 @@
         <role-name>payaraAdmin</role-name>
         <group-name>payaraAdmin</group-name>
     </security-role-mapping>
+    
+        <security-role-mapping>
+        <role-name>payaraUser</role-name>
+        <group-name>payaraUser</group-name>
+    </security-role-mapping>
 
     <parameter-encoding default-charset="UTF-8" />
 
