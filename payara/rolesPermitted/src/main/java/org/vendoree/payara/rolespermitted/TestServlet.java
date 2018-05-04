@@ -39,7 +39,6 @@
  */
 package org.vendoree.payara.rolespermitted;
 
-import fish.payara.cdi.auth.roles.RolesPermitted;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.inject.Inject;
