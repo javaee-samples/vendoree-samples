@@ -57,8 +57,8 @@ import org.junit.runner.RunWith;
 import org.junit.Before;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.junit.After;
-import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
@@ -71,7 +71,6 @@ public class RolesPermittedTest {
     private static final String WEBAPP_SOURCE = "src/main/webapp";
     private static final String USERNAME = "payara";
     private static final String PASSWORD_ADMIN = "fish";
-    private static final String PASSWORD_USER = "user";
 
     private WebClient webClient;
 
@@ -82,7 +81,6 @@ public class RolesPermittedTest {
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class, "rolesPermitted.war")
                 .addPackage("org.vendoree.payara.rolespermitted")
-                .addPackage("org.vendoree.payara.rolespermitted.rest")
                 .addAsWebInfResource(new File(WEBAPP_SOURCE, "WEB-INF/web.xml"))
                 .addAsWebInfResource(new File(WEBAPP_SOURCE, "WEB-INF/glassfish-web.xml"));
     }
@@ -98,34 +96,16 @@ public class RolesPermittedTest {
     @Test
     @RunAsClient
     public void testAuthenticationWithIncorrectUser() {
-        WebResponse response = getResponse("/rest/test/admin?username=" + "wrongUser" + "&password=" + PASSWORD_ADMIN);
-        System.out.println("sdad = " + response.getContentAsString());
-        assertEquals(401, response.getStatusCode());
+        WebResponse webResponse = getResponse("/testServlet?username=" + "wrongUser" + "&password=" + PASSWORD_ADMIN);
+        assertEquals(401, webResponse.getStatusCode());
     }
 
     @Test
     @RunAsClient
-    public void testToAccessAdminResource() {
-        WebResponse webresponse = getResponse("/rest/test/admin?username=" + USERNAME + "&password=" + PASSWORD_ADMIN);
-        assertEquals(200, webresponse.getStatusCode());
-
-        String response = getResponse("/rest/test/admin?username=" + USERNAME + "&password=" + PASSWORD_USER).getContentAsString();
-        if (response.contains("Caller was not permitted access to a protected resource")) {
-            Assert.assertTrue("User was sucessfully not permitted to access admin resource", true);
-        } else {
-            Assert.fail("Only admin should be able to access admin protected resource");
-
-        }
-    }
-
-    @Test
-    @RunAsClient
-    public void testToAccessGeneralResource() {
-        WebResponse webresponse = getResponse("/rest/test/admin?username=" + USERNAME + "&password=" + PASSWORD_ADMIN);
-        assertEquals(200, webresponse.getStatusCode());
-
-        WebResponse webresponse2 = getResponse("/rest/test/admin?username=" + USERNAME + "&password=" + PASSWORD_USER);
-        assertEquals(200, webresponse2.getStatusCode());
+    public void testAuthenticationWithCorrectUser() {
+        WebResponse webResponse = getResponse("/testServlet?username=" + USERNAME + "&password=" + PASSWORD_ADMIN);
+        assertEquals(200, webResponse.getStatusCode());
+        assertTrue("User doesn't have the corrrect role", webResponse.getContentAsString().contains("Does User belong to role \"payaraAdmin\" : true"));
     }
 
     private WebResponse getResponse(String url) {
