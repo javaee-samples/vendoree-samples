@@ -43,8 +43,7 @@
     <parent>
         <groupId>org.vendoree</groupId>
         <artifactId>payara</artifactId>
-        <version>2.2-SNAPSHOT</version>
-        <relativePath>../</relativePath>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     
     <groupId>fish.payara.tests</groupId>
@@ -52,47 +51,5 @@
     <name>Payara Tests - OAuth2</name>
     
     <packaging>war</packaging>
-    
-    <dependencies>
-        <dependency>
-            <groupId>net.sourceforge.htmlunit</groupId>
-            <artifactId>htmlunit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>fish.payara.api</groupId>
-            <artifactId>payara-api</artifactId>
-            <version>${payara.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.arquillian.junit</groupId>
-            <artifactId>arquillian-junit-container</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.shrinkwrap</groupId>
-            <artifactId>shrinkwrap-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        
-    </dependencies>
-    
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.21.0</version>
-                <configuration>
-                    <skipTests>${skipSecurity}</skipTests>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     
 </project>
