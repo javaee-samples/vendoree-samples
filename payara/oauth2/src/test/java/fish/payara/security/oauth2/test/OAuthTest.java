@@ -39,28 +39,32 @@
  */
 package fish.payara.security.oauth2.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
+import java.net.URL;
+
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
 import fish.payara.security.oauth2.testapp.Callback;
 import fish.payara.security.oauth2.testapp.Endpoint;
 import fish.payara.security.oauth2.testapp.SecuredPage;
 import fish.payara.security.oauth2.testapp.UnsecuredPage;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  *
@@ -70,28 +74,26 @@ import org.junit.runner.RunWith;
 public class OAuthTest {
     
     private WebClient webClient;
-    private static String warName;
     
-    private static final String HOST = "http://localhost:8080/oauthtest";
+    @ArquillianResource
+    private URL base;
     
     @Before
     public void init() {
-        
         webClient = new WebClient();
         System.out.println("Set up new WebClient");
     }
     
     @Deployment
-    public static WebArchive createDeployment()
-    {
+    public static WebArchive createDeployment() {
+        
         // Create a war with the test app
         WebArchive war = ShrinkWrap.create(WebArchive.class, "oauthtest.war")
                 .addClass(Callback.class)
                 .addClass(Endpoint.class)
                 .addClass(SecuredPage.class)
                 .addClass(UnsecuredPage.class).addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml"); 
-
-        warName = "oauthtest";
+        
         // Print out directory contents
         System.out.println(war.toString(true));
 
@@ -102,21 +104,18 @@ public class OAuthTest {
     @Test
     @RunAsClient
     public void runOAuthTest() throws IOException {
-        String result;
-        String baseURL = HOST + warName;
-        result = ((TextPage) webClient.getPage(HOST + "/Unsecured")).getContent();
+        String result = ((TextPage) webClient.getPage(base + "Unsecured")).getContent();
         assertEquals("This is an unsecured web page", result);
         
-        TextPage page= (TextPage) webClient.getPage(HOST + "/Secured");
+        TextPage page= (TextPage) webClient.getPage(base + "Secured");
         assertEquals("/oauthtest/Callback", page.getUrl().getPath());
         assertNotEquals("null", page.getContent());
         
         try {
-            webClient.getPage(HOST + "/Secured");
+            webClient.getPage(base + "Secured");
             fail("Roles test failed");
         } catch (FailingHttpStatusCodeException e){
             System.out.println("Successfully forbidden from accessing page because of " + e.getStatusMessage());
-            
         }
         
     }

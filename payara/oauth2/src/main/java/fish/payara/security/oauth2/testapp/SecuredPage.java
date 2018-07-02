@@ -39,8 +39,8 @@
  */
 package fish.payara.security.oauth2.testapp;
 
-import fish.payara.security.oauth2.annotation.OAuth2AuthenticationDefinition;
 import java.io.IOException;
+
 import javax.annotation.security.DeclareRoles;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HttpConstraint;
@@ -50,16 +50,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import fish.payara.security.annotations.OAuth2AuthenticationDefinition;
+
 /**
  *
  * @author jonathan
  */
 @WebServlet("/Secured")
-@OAuth2AuthenticationDefinition(authEndpoint = "http://localhost:8080/oauthtest/Endpoint", tokenEndpoint = "http://localhost:8080/oauthtest/Endpoint",
-        clientId = "qwertyuiop", clientSecret = "asdfghjklzxcvbnm", redirectURI = "http://localhost:8080/oauthtest/Callback")
+@OAuth2AuthenticationDefinition(
+        authEndpoint = "http://localhost:8080/oauthtest/Endpoint", 
+        tokenEndpoint = "http://localhost:8080/oauthtest/Endpoint", 
+        clientId = "qwertyuiop", 
+        clientSecret = "asdfghjklzxcvbnm", 
+        redirectURI = "http://localhost:8080/oauthtest/Callback")
 @DeclareRoles("all")
-@ServletSecurity(@HttpConstraint(rolesAllowed={"all"}))
+@ServletSecurity(@HttpConstraint(rolesAllowed = "all"))
 public class SecuredPage extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

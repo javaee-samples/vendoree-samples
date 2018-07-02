@@ -38,18 +38,16 @@
  only if the new code is made subject to such option by the copyright
  holder.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"> <modelVersion>4.0.0</modelVersion>
+    
     <parent>
-        <groupId>org.vendoree</groupId>
-        <artifactId>payara</artifactId>
+        <groupId>org.vendoree.payara</groupId>
+        <artifactId>payara-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     
-    <groupId>fish.payara.tests</groupId>
     <artifactId>oauth2</artifactId>
-    <name>Payara Tests - OAuth2</name>
-    
+    <name>Vendor EE: Payara - OAuth2</name>
     <packaging>war</packaging>
     
 </project>
