@@ -57,10 +57,11 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet("/Secured")
 @OpenIdAuthenticationDefinition(
-        providerURI = "http://localhost:8080/openid-server/webresources/oidc-provider/.well-known/openid-configuration",
+        providerURI = "http://localhost:8080/openid-server/webresources/oidc-provider",
         clientId = CLIENT_ID_VALUE,
         clientSecret = CLIENT_SECRET_VALUE,
-        redirectURI = "${baseUrl}/Callback")
+        redirectURI = "${baseURL}/Callback"
+)
 @DeclareRoles("all")
 @ServletSecurity(@HttpConstraint(rolesAllowed = "all"))
 public class SecuredPage extends HttpServlet {
