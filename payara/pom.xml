@@ -17,6 +17,7 @@
         <module>jacc-per-app</module>
         <module>rolesPermitted</module>
         <module>oauth2</module>
+        <module>openid</module>
     </modules>
 
     <dependencies>
