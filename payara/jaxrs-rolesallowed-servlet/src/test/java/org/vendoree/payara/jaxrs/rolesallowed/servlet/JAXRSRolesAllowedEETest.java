@@ -38,8 +38,6 @@ public class JAXRSRolesAllowedEETest {
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
-
-        ServerOperations.addUserToContainerIdentityStore("test", "a");
         ServerOperations.addUserToContainerIdentityStore("test", "a");
 
         WebArchive archive =
