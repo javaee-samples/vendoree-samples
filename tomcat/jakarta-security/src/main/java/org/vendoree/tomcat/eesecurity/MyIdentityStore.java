@@ -1,4 +1,4 @@
-package fish.payara.tomcat;
+package org.vendoree.tomcat.eesecurity;
 
 import static java.util.Arrays.asList;
 import static javax.security.enterprise.identitystore.CredentialValidationResult.INVALID_RESULT;

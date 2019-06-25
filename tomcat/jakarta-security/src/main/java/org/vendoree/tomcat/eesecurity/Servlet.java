@@ -1,5 +1,5 @@
-
-package fish.payara.tomcat;
+/** Copyright Payara Services Limited **/
+package org.vendoree.tomcat.eesecurity;
 
 import java.io.IOException;
 
@@ -12,19 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.microprofile.auth.LoginConfig;
-
-
-//@BasicAuthenticationMechanismDefinition(
-//    realmName="myRealm"
-//)
-
-@LoginConfig(
-        authMethod = "MP-JWT",
-        // Even though specified being only for HTTP Basic auth, JBoss/WildFly/Swarm mandates this
-        // to refer to its proprietary "security domain" concept.
-        realmName = "MP-JWT"
-    )
+@BasicAuthenticationMechanismDefinition(realmName = "myRealm")
 
 @WebServlet("/servlet")
 @ServletSecurity(@HttpConstraint(rolesAllowed = "myRole"))

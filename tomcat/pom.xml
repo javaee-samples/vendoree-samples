@@ -15,6 +15,7 @@
 
     <modules>
         <module>jwt</module>
+        <module>jakarta-security</module>
     </modules>
 
     <dependencies>
@@ -22,6 +23,7 @@
             <groupId>org.vendoree</groupId>
             <artifactId>test-utils</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

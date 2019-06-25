@@ -33,7 +33,7 @@ public class JwtTokenGenerator {
         JSONObject jwtJson = (JSONObject) parser.parse(byteBuffer);
         
         long currentTimeInSecs = (System.currentTimeMillis() / 1000);
-        long expirationTime = currentTimeInSecs + 1000;
+        long expirationTime = currentTimeInSecs + 10000000;
        
         jwtJson.put(Claims.iat.name(), currentTimeInSecs);
         jwtJson.put(Claims.auth_time.name(), currentTimeInSecs);

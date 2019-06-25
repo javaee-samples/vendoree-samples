@@ -1,5 +1,5 @@
 /** Copyright Payara Services Limited **/
-package org.eclipse.microprofile14.jwtauth.basic;
+package org.vendoree.tomcat.jwt;
 
 import static javax.ws.rs.client.ClientBuilder.newClient;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
@@ -16,16 +16,19 @@ import java.net.URL;
 
 import javax.ws.rs.core.Response;
 
-import org.eclipse.microprofile14.jwtauth.basic.ApplicationInit;
-import org.eclipse.microprofile14.jwtauth.basic.Servlet;
 import org.glassfish.soteria.cdi.CdiUtils;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.vendoree.tomcat.jwt.ApplicationInit;
+import org.vendoree.tomcat.jwt.Servlet;
 
 /**
  * @author Arjan Tijms
@@ -38,6 +41,7 @@ public class BasicAuthenticationTest {
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
+        try {
         WebArchive archive =
             create(WebArchive.class)
                 .addClasses(
@@ -52,6 +56,18 @@ public class BasicAuthenticationTest {
                     // Public key to verify the incoming signed JWT's signature
                     "META-INF/public-key.pem"
                 ).addAsManifestResource(new File("src/main/webapp/META-INF/context.xml"))
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                .addAsLibraries(
+                    Maven.resolver()
+                         .loadPomFromFile("pom.xml")
+                         .resolve(
+                             "org.jboss.weld.servlet:weld-servlet-shaded", 
+                             "fish.payara.microprofile.jwt-auth:microprofile-jwt-auth",
+                             "io.smallrye:smallrye-config",
+                             "org.glassfish:javax.json"
+                                 )
+                         .withTransitivity()
+                         .as(JavaArchive.class))
                 ;
 
         System.out.println("************************************************************");
@@ -61,6 +77,10 @@ public class BasicAuthenticationTest {
         System.out.println("War file content: \n" + archive.toString(true));
 
         return archive;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
 
     }
 
@@ -93,6 +113,10 @@ public class BasicAuthenticationTest {
                      .request(TEXT_PLAIN)
                      .header(AUTHORIZATION, "Bearer " + generateJWTString("jwt-token.json"))
                      .get(String.class);
+        
+        System.out.println("\n" + AUTHORIZATION + "=" + "Bearer " + generateJWTString("jwt-token.json"));
+        
+        System.out.println("\nResponse: \"" + response + "\"\n");
 
         // Now has to be logged-in so page is accessible
         assertTrue(

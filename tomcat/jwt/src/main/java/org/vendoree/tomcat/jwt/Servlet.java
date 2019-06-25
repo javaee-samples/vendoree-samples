@@ -1,5 +1,5 @@
 /* Copyright Payara Services Limited */
-package org.eclipse.microprofile14.jwtauth.basic;
+package org.vendoree.tomcat.jwt;
 
 import java.io.IOException;
 

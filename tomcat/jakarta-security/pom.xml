@@ -3,12 +3,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>tomcat-security</groupId>
+    <groupId>org.vendoree.tomcat</groupId>
     <artifactId>tomcat-security</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>Tomcat-Security</name>
+    <name>Jakarta Security</name>
 
     <properties>
         <failOnMissingWebXml>false</failOnMissingWebXml>
@@ -42,11 +42,27 @@
             <artifactId>jakarta.security.enterprise</artifactId>
             <version>1.0.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.0</version>
+        </dependency>
         
         <dependency>
             <groupId>fish.payara.microprofile.jwt-auth</groupId>
             <artifactId>microprofile-jwt-auth</artifactId>
             <version>5.193-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish.main.deployment</groupId>
+                    <artifactId>dol</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.main.common</groupId>
+                    <artifactId>internal-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
